@@ -1,63 +1,3 @@
-//using UnityEngine;
-//using Unity.Cinemachine;
-
-//public class CameraController : MonoBehaviour
-//{
-//    [Header("Cinemachine Cameras")]
-//    [SerializeField] private CinemachineCamera firstPersonCamera; // 一人称視点カメラ
-//    [SerializeField] private CinemachineCamera topDownCamera;    // 俯瞰視点カメラ
-
-//    [Header("Settings")]
-//    [SerializeField] private KeyCode toggleKey = KeyCode.Tab;      // 切り替え用キー
-//    [SerializeField] private bool startWithFirstPerson = true;   // 初期状態の設定
-
-//    private bool isFirstPerson;
-
-//    private void Start()
-//    {
-//        // 初期状態のセット
-//        isFirstPerson = startWithFirstPerson;
-//        UpdateCameraPriority();
-//    }
-
-//    private void Update()
-//    {
-//        // 指定したキーが押されたら切り替え
-//        if (Input.GetKeyDown(toggleKey))
-//        {
-//            ToggleView();
-//        }
-//    }
-
-//    /// <summary>
-//    /// 視点をトグル（反転）切り替え
-//    /// </summary>
-//    public void ToggleView()
-//    {
-//        isFirstPerson = !isFirstPerson;
-//        UpdateCameraPriority();
-//    }
-
-//    /// <summary>
-//    /// Priorityを変更してアクティブなカメラを決定
-//    /// </summary>
-//    private void UpdateCameraPriority()
-//    {
-//        if (firstPersonCamera == null || topDownCamera == null) return;
-
-//        if (isFirstPerson)
-//        {
-//            firstPersonCamera.Priority = 10;
-//            topDownCamera.Priority = 0;
-//        }
-//        else
-//        {
-//            firstPersonCamera.Priority = 0;
-//            topDownCamera.Priority = 10;
-//        }
-//    }
-//}
-
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -110,13 +50,13 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // --- 1. Tabキーによる視点切り替え処理 ---
+        //Tabキーによる視点切り替え処理
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleViewMode();
         }
 
-        // --- 2. フェーズごとのループ処理 ---
+        //フェーズごとのループ処理
         switch (currentGameState)
         {
             case GameState.BuildPhase:
@@ -135,11 +75,11 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        // UI表示の更新
+        //UI表示の更新
         UpdateStatsUI();
     }
 
-    // 視点（カメラと対応UI）の切り替え
+    //視点（カメラと対応UI）の切り替え
     public void ToggleViewMode()
     {
         if (currentViewMode == ViewMode.Overview)
@@ -186,24 +126,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // --- 建築フェーズの処理 ---
+    //建築フェーズの処理
     private void UpdateBuildPhase()
     {
-        // スペースキーまたは画面クリック等でウェーブ開始（例）
+        // スペースキーでウェーブ開始
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StartWave();
         }
     }
 
-    // --- ウェーブ中の処理 ---
+    //ウェーブ中の処理
     private void UpdateWavePhase()
     {
-        // 敵の全滅検知や拠点HPの確認ロジックをここに記述
+        /*
         if (baseHealth <= 0)
         {
             GameOver();
-        }
+        }*/
     }
 
     public void StartWave()
