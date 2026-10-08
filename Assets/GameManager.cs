@@ -149,9 +149,14 @@ public class GameManager : MonoBehaviour
     public void StartWave()
     {
         currentGameState = GameState.WavePhase;
-
-        // ウェーブ開始時は自動的に主人公視点に移行させる場合
         SetViewMode(ViewMode.PlayerView);
+
+        // WaveManagerへ開始通知
+        WaveManager waveManager = FindFirstObjectByType<WaveManager>();
+        if (waveManager != null)
+        {
+            waveManager.StartNextWave();
+        }
     }
 
     public void EndWave()
