@@ -1,23 +1,23 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Cinemachine;
 
 public class GameManager : MonoBehaviour
 {
-    // ƒQ[ƒ€‚Ìó‘Ô’è‹`
+    // ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹å®šç¾©
     public enum GameState
     {
-        BuildPhase,  // “ƒiƒ^ƒ[j‚Ì”z’uƒtƒF[ƒYiã‚©‚ç‹“_„§j
-        WavePhase,   // “G‚ÌNUƒtƒF[ƒYi‘€ìEUŒ‚ƒtƒF[ƒYj
-        ResultPhase  // ƒNƒŠƒAEƒQ[ƒ€ƒI[ƒo[
+        BuildPhase,  // å¡”ï¼ˆã‚¿ãƒ¯ãƒ¼ï¼‰ã®é…ç½®ãƒ•ã‚§ãƒ¼ã‚º
+        WavePhase,   // æ•µã®ä¾µæ”»ãƒ•ã‚§ãƒ¼ã‚ºï¼ˆæ“ä½œãƒ»æ”»æ’ƒãƒ•ã‚§ãƒ¼ã‚ºï¼‰
+        ResultPhase  // ã‚¯ãƒªã‚¢ãƒ»ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
     }
 
-    // ‹“_‚Ìó‘Ô’è‹`
+    // è¦–ç‚¹ã®çŠ¶æ…‹å®šç¾©
     public enum ViewMode
     {
-        Overview,   // ˜ëáÕiã‚©‚ç‹“_j
-        PlayerView  // ålŒöiOlÌ/ˆêlÌ‹“_j
+        Overview,   // ä¿¯ç°ï¼ˆä¸Šã‹ã‚‰è¦–ç‚¹ï¼‰
+        PlayerView  // ä¸»äººå…¬ï¼ˆä¸‰äººç§°/ä¸€äººç§°è¦–ç‚¹ï¼‰
     }
 
     [Header("State")]
@@ -25,23 +25,34 @@ public class GameManager : MonoBehaviour
     public ViewMode currentViewMode = ViewMode.Overview;
 
     [Header("Cinemachine Cameras")]
-    public CinemachineCamera overviewCamera;   // ã‚©‚çŒ©‰º‚ë‚·ƒJƒƒ‰
-    public CinemachineCamera playerFollowCamera; // ålŒö‚É’Ç]‚·‚éƒJƒƒ‰
-    
+    public CinemachineCamera overviewCamera;   // ä¸Šã‹ã‚‰è¦‹ä¸‹ã‚ã™ã‚«ãƒ¡ãƒ©
+    public CinemachineCamera playerFollowCamera; // ä¸»äººå…¬ã«è¿½å¾“ã™ã‚‹ã‚«ãƒ¡ãƒ©
+
     [Header("UI Groups")]
-    public GameObject buildUIGroup;   // Œš’z—pUIiƒVƒ‡ƒbƒvAİ’uƒ{ƒ^ƒ“‚È‚Çj
-    public GameObject actionUIGroup;  // ålŒö—pUIiƒNƒƒXƒwƒAA’e–ò‚È‚Çj
-    public GameObject resultUIGroup;  // ƒŠƒUƒ‹ƒg‰æ–ÊUI
+    public GameObject buildUIGroup;   // å»ºç¯‰ç”¨UI
+    public GameObject actionUIGroup;  // ä¸»äººå…¬ç”¨UI
+    public GameObject resultUIGroup;  // ãƒªã‚¶ãƒ«ãƒˆç”»é¢UI
 
     [Header("UI Displays")]
     public Text waveText;
     public Text goldText;
     public Text baseHealthText;
-    
+    public Text startWaveGuideText;
+
+    [Header("Result UI Displays")]
+    public Text resultTitleText;    // ã€ŒGAME OVERã€ã¾ãŸã¯ã€ŒGAME CLEARã€
+    public Text resultWaveText;     // ã€ŒReached Wave: Xã€ãªã©
+
     [Header("Game Data")]
     public int currentWave = 1;
+    public int maxWave = 5;          // å…¨ä½•ã‚¦ã‚§ãƒ¼ãƒ–ã§ã‚¯ãƒªã‚¢ã«ã™ã‚‹ã‹
     public int playerGold = 100;
     public int baseHealth = 10;
+
+    [Header("Passive Income Settings")]
+    public int goldPerInterval = 2;     // 1å›ã«ã‚‚ã‚‰ãˆã‚‹ã‚´ãƒ¼ãƒ«ãƒ‰ã®é‡
+    public float incomeInterval = 1.0f;  // ã‚´ãƒ¼ãƒ«ãƒ‰ãŒå…¥ã‚‹é–“éš”ï¼ˆç§’ï¼‰
+    private float incomeTimer = 0f;      // ã‚¿ã‚¤ãƒãƒ¼ç”¨å¤‰æ•°
 
     void Start()
     {
@@ -50,13 +61,13 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        //TabƒL[‚É‚æ‚é‹“_Ø‚è‘Ö‚¦ˆ—
+        // Tabã‚­ãƒ¼ã«ã‚ˆã‚‹è¦–ç‚¹åˆ‡ã‚Šæ›¿ãˆå‡¦ç†
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleViewMode();
         }
 
-        //ƒtƒF[ƒY‚²‚Æ‚Ìƒ‹[ƒvˆ—
+        // ãƒ•ã‚§ãƒ¼ã‚ºã”ã¨ã®ãƒ«ãƒ¼ãƒ—å‡¦ç†
         switch (currentGameState)
         {
             case GameState.BuildPhase:
@@ -75,11 +86,11 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        //UI•\¦‚ÌXV
+        // UIè¡¨ç¤ºã®æ›´æ–°
         UpdateStatsUI();
     }
 
-    //‹“_iƒJƒƒ‰‚Æ‘Î‰UIj‚ÌØ‚è‘Ö‚¦
+    // è¦–ç‚¹ï¼ˆã‚«ãƒ¡ãƒ©ã¨å¯¾å¿œUIï¼‰ã®åˆ‡ã‚Šæ›¿ãˆ
     public void ToggleViewMode()
     {
         if (currentViewMode == ViewMode.Overview)
@@ -98,60 +109,65 @@ public class GameManager : MonoBehaviour
 
         if (currentViewMode == ViewMode.Overview)
         {
-            // ã‚©‚ç‹“_‚ÉØ‘Ö
             if (overviewCamera != null) overviewCamera.Priority = 10;
             if (playerFollowCamera != null) playerFollowCamera.Priority = 0;
 
-            // ƒJ[ƒ\ƒ‹‚ğ•\¦‚µ‚Ä‘€ì‰Â”\‚É‚·‚éiUIƒNƒŠƒbƒN—pj
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // UIØ‚è‘Ö‚¦
+            // ğŸ’¡ ãƒªã‚¶ãƒ«ãƒˆãƒ•ã‚§ãƒ¼ã‚ºã§ãªã„æ™‚ã®ã¿å»ºç¯‰UIã‚’è¡¨ç¤º
             if (buildUIGroup) buildUIGroup.SetActive(currentGameState == GameState.BuildPhase);
             if (actionUIGroup) actionUIGroup.SetActive(false);
         }
         else if (currentViewMode == ViewMode.PlayerView)
         {
-            // ålŒö‹“_‚ÉØ‘Ö
             if (overviewCamera != null) overviewCamera.Priority = 0;
             if (playerFollowCamera != null) playerFollowCamera.Priority = 10;
 
-            // ƒJ[ƒ\ƒ‹‚ğ‰æ–Ê’†‰›‚ÉŒÅ’èiTPS/FPS‘€ì—pj
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            // UIØ‚è‘Ö‚¦
             if (buildUIGroup) buildUIGroup.SetActive(false);
             if (actionUIGroup) actionUIGroup.SetActive(true);
         }
     }
 
-    //Œš’zƒtƒF[ƒY‚Ìˆ—
     private void UpdateBuildPhase()
     {
-        // ƒXƒy[ƒXƒL[‚ÅƒEƒF[ƒuŠJn
+        // ã‚¹ãƒšãƒ¼ã‚¹ã‚­ãƒ¼ã§ã‚¦ã‚§ãƒ¼ãƒ–é–‹å§‹
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StartWave();
         }
     }
 
-    //ƒEƒF[ƒu’†‚Ìˆ—
     private void UpdateWavePhase()
     {
-        /*
+        // ã‚¿ã‚¤ãƒãƒ¼ã‚’é€²ã‚ã‚‹
+        incomeTimer += Time.deltaTime;
+
+        // è¨­å®šã—ãŸé–“éš”ãŒçµŒéã—ãŸã‚‰ã‚´ãƒ¼ãƒ«ãƒ‰ã‚’åŠ ç®—
+        if (incomeTimer >= incomeInterval)
+        {
+            playerGold += goldPerInterval;
+            incomeTimer = 0f;
+        }
+
+        // æ‹ ç‚¹HPãŒ0ä»¥ä¸‹ã§ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
         if (baseHealth <= 0)
         {
             GameOver();
-        }*/
+        }
     }
 
     public void StartWave()
     {
         currentGameState = GameState.WavePhase;
+        incomeTimer = 0f;
+
         SetViewMode(ViewMode.PlayerView);
 
-        // WaveManager‚ÖŠJn’Ê’m
+        // WaveManagerã¸é–‹å§‹é€šçŸ¥
         WaveManager waveManager = FindFirstObjectByType<WaveManager>();
         if (waveManager != null)
         {
@@ -161,10 +177,16 @@ public class GameManager : MonoBehaviour
 
     public void EndWave()
     {
+        // æœ€çµ‚ã‚¦ã‚§ãƒ¼ãƒ–ã‚’ã‚¯ãƒªã‚¢ã—ãŸã‹ã®åˆ¤å®š
+        if (currentWave >= maxWave)
+        {
+            GameClear();
+            return;
+        }
+
         currentWave++;
         currentGameState = GameState.BuildPhase;
 
-        // ƒEƒF[ƒuI—¹‚ÍŒš’z‚Ì‚½‚ß‚Éã‚©‚ç‹“_‚Ö–ß‚·
         SetViewMode(ViewMode.Overview);
     }
 
@@ -173,18 +195,59 @@ public class GameManager : MonoBehaviour
         currentGameState = GameState.ResultPhase;
         HideAllUI();
 
+        if (resultTitleText)
+        {
+            resultTitleText.text = "GAME OVER";
+            resultTitleText.color = Color.red;
+        }
+        if (resultWaveText)
+        {
+            resultWaveText.text = $"Reached Wave: {currentWave}";
+        }
+
         if (resultUIGroup) resultUIGroup.SetActive(true);
 
-        // ƒJ[ƒ\ƒ‹ƒƒbƒN‰ğœ
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    private void GameClear()
+    {
+        currentGameState = GameState.ResultPhase;
+        HideAllUI();
+
+        if (resultTitleText)
+        {
+            resultTitleText.text = "ALL CLEAR!";
+            resultTitleText.color = Color.yellow;
+        }
+        if (resultWaveText)
+        {
+            resultWaveText.text = $"Cleared All {maxWave} Waves!";
+        }
+
+        if (resultUIGroup) resultUIGroup.SetActive(true);
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     private void UpdateStatsUI()
     {
-        if (waveText) waveText.text = $"WAVE: {currentWave}";
+        if (waveText) waveText.text = $"WAVE: {currentWave} / {maxWave}";
         if (goldText) goldText.text = $"GOLD: {playerGold}";
         if (baseHealthText) baseHealthText.text = $"BASE HP: {baseHealth}";
+
+        if (startWaveGuideText)
+        {
+            bool isBuildPhase = (currentGameState == GameState.BuildPhase);
+            startWaveGuideText.gameObject.SetActive(isBuildPhase);
+
+            if (isBuildPhase)
+            {
+                startWaveGuideText.text = "[ SPACE ] ã‚­ãƒ¼ã§ã‚¦ã‚§ãƒ¼ãƒ–é–‹å§‹";
+            }
+        }
     }
 
     private void HideAllUI()
@@ -194,19 +257,25 @@ public class GameManager : MonoBehaviour
         if (resultUIGroup) resultUIGroup.SetActive(false);
     }
 
+    // ğŸ’¡ ä¿®æ­£: ã‚²ãƒ¼ãƒ é–‹å§‹æ™‚ã«å…¨ã¦ã®UIã‚’ä¸€å›éè¡¨ç¤ºã«ã—ã¦ã‹ã‚‰åˆæœŸåŒ–
     private void InitializeGame()
     {
         currentWave = 1;
         playerGold = 100;
         baseHealth = 10;
+        incomeTimer = 0f;
 
         currentGameState = GameState.BuildPhase;
-        SetViewMode(ViewMode.Overview); // ‰Šúó‘Ô‚ÍŒš’z—p‚ÌŒ©‰º‚ë‚µ‹“_
+
+        // å…¨UIã‚’ä¸€åº¦éš ã™ï¼ˆã“ã‚Œã§ResultUIGroupã‚‚æ¶ˆãˆã¾ã™ï¼‰
+        HideAllUI();
+
+        // ä¿¯ç°è¦–ç‚¹ã«ã—ã¦å»ºç¯‰ç”¨UIã‚’æœ‰åŠ¹åŒ–
+        SetViewMode(ViewMode.Overview);
     }
 
     public void ResetGame()
     {
-        HideAllUI();
         InitializeGame();
     }
 }
