@@ -18,7 +18,7 @@ public class StructurePlacementManager : MonoBehaviour
     private PlacementType currentType = PlacementType.None;
 
     private GameObject previewObject; // 設置プレビュー表示用
-    private float currentYRotation = 0f; // 💡 追加: 現在のY軸回転角度（0度/90度など）
+    private float currentYRotation = 0f; // 現在のY軸回転角度（0度/90度など）
 
     void Update()
     {
@@ -41,14 +41,14 @@ public class StructurePlacementManager : MonoBehaviour
         // 設置モード中の処理
         if (currentType != PlacementType.None)
         {
-            // 💡 追加: Rキーで90度回転（縦横切替）
+            //  Rキーで90度回転（縦横切替）
             if (Input.GetKeyDown(KeyCode.R))
             {
                 currentYRotation += 90f;
                 if (currentYRotation >= 360f) currentYRotation = 0f;
             }
 
-            // 💡 追加: マウスホイール上下でも回転可能
+            // マウスホイール上下でも回転可能
             float scroll = Input.GetAxis("Mouse ScrollWheel");
             if (scroll > 0f) currentYRotation += 90f;
             else if (scroll < 0f) currentYRotation -= 90f;
@@ -75,7 +75,7 @@ public class StructurePlacementManager : MonoBehaviour
         {
             previewObject = Instantiate(prefabToSpawn);
 
-            // プレビュー用にColliderを一時的に無効化（レイキャストの邪魔にならないようにする）
+            // プレビュー用にColliderを一時的に無効化
             Collider[] colliders = previewObject.GetComponentsInChildren<Collider>();
             foreach (var col in colliders)
             {
@@ -92,7 +92,7 @@ public class StructurePlacementManager : MonoBehaviour
             if (previewObject != null)
             {
                 previewObject.transform.position = hit.point;
-                // 💡 回転角度（currentYRotation）をプレビューに反映
+                // 回転角度（currentYRotation）をプレビューに反映
                 previewObject.transform.rotation = Quaternion.Euler(0f, currentYRotation, 0f);
             }
         }
@@ -116,7 +116,7 @@ public class StructurePlacementManager : MonoBehaviour
 
             // 実体を回転値を引き継いで生成
             GameObject prefabToSpawn = (currentType == PlacementType.Wall) ? wallPrefab : spikePrefab;
-            Quaternion spawnRotation = Quaternion.Euler(0f, currentYRotation, 0f); // 💡 回転を適用
+            Quaternion spawnRotation = Quaternion.Euler(0f, currentYRotation, 0f); // 回転を適用
 
             Instantiate(prefabToSpawn, hit.point, spawnRotation);
         }

@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
     public float rotateSpeed = 50.0f;      // 回転速度（度/s）
 
     [Header("Height Settings")]
-    public float playerHeightOffset = 0.0f; // 地面からの高さオフセット（通常は0または正の値）
+    public float playerHeightOffset = 0.0f; // 地面からの高さオフセット
 
     private float currentAngle = 0f;
 

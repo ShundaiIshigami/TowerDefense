@@ -1,19 +1,24 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
     [Header("Orbit Settings")]
-    public Transform centerPoint;      // ‰ñ“]‚Ì’†S
-    public float orbitDistance = 2.5f;  // ‰ñ“]”¼Œa
-    public float orbitSpeed = 360.0f;   // ‰ñ“]‘¬“xi“x/•bj
+    public Transform centerPoint;      // å›è»¢ã®ä¸­å¿ƒ
+    public float orbitDistance = 2.5f;  // å›è»¢åŠå¾„
+    public float orbitSpeed = 360.0f;   // å›è»¢é€Ÿåº¦ï¼ˆåº¦/ç§’ï¼‰
+    public float initialAngle = 0f;     // åˆæœŸè§’åº¦
 
     [Header("Attack Settings")]
-    public int damage = 1;              // “G‚É—^‚¦‚éƒ_ƒ[ƒW
+    public int damage = 1;              // æ•µã«ä¸ãˆã‚‹ãƒ€ãƒ¡ãƒ¼ã‚¸
 
-    private float accumulatedAngle = 0f; // ‰ñ“]‚µ‚½‡ŒvŠp“x
+    private float currentAngle = 0f;    // ç¾åœ¨ã®ä½ç½®ã®è§’åº¦
+    private float rotatedTotalAngle = 0f; // å›è»¢ã—ãŸã€Œåˆè¨ˆã€è§’åº¦
 
     void Start()
     {
+        currentAngle = initialAngle;
+        rotatedTotalAngle = 0f;
+
         if (centerPoint == null && transform.parent != null)
         {
             centerPoint = transform.parent;
@@ -24,20 +29,21 @@ public class Bullet : MonoBehaviour
     {
         if (centerPoint == null) return;
 
-        // ƒtƒŒ[ƒ€‚²‚Æ‚ÌˆÚ“®Šp“x
+        // ãƒ•ãƒ¬ãƒ¼ãƒ ã”ã¨ã®ç§»å‹•è§’åº¦
         float deltaAngle = orbitSpeed * Time.deltaTime;
-        accumulatedAngle += deltaAngle;
 
-        // ‰~‰^“®‚ÌˆÊ’uŒvZiƒvƒŒƒCƒ„[‚Ì‘O•û‚©‚çƒXƒ^[ƒgj
-        float rad = accumulatedAngle * Mathf.Deg2Rad;
+        currentAngle += deltaAngle;
+        rotatedTotalAngle += deltaAngle; // å®Ÿéš›ã«å›è»¢ã—ãŸè§’åº¦ã‚’åŠ ç®—
+
+        // å††é‹å‹•ã®ä½ç½®è¨ˆç®—
+        float rad = currentAngle * Mathf.Deg2Rad;
         float x = centerPoint.position.x + Mathf.Cos(rad) * orbitDistance;
         float z = centerPoint.position.z + Mathf.Sin(rad) * orbitDistance;
-        float y = centerPoint.position.y + 0.5f; // ‚‚³‚ÌƒIƒtƒZƒbƒg
+        float y = centerPoint.position.y + 0.5f; // é«˜ã•ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 
         transform.position = new Vector3(x, y, z);
 
-        // 1üi360“xj‰ñ“]‚µ‚½‚çÁ–Å
-        if (accumulatedAngle >= 360f)
+        if (rotatedTotalAngle >= 360f)
         {
             Destroy(gameObject);
         }
@@ -45,7 +51,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // “G‚É“–‚½‚Á‚½‚Ìƒ_ƒ[ƒWˆ—
+        // æ•µã«å½“ãŸã£ãŸæ™‚ã®ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
         if (other.CompareTag("Enemy"))
         {
             Enemy enemy = other.GetComponent<Enemy>();

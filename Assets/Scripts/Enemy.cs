@@ -26,13 +26,11 @@ public class Enemy : MonoBehaviour
         gameManager = FindFirstObjectByType<GameManager>();
         waveManager = FindFirstObjectByType<WaveManager>();
 
-        // Tagの設定確認推奨（Inspectorで "Enemy" タグを設定してください）
         if (!gameObject.CompareTag("Enemy"))
         {
             gameObject.tag = "Enemy";
         }
 
-        // Rigidbody の設定（Trigger判定に必要なため）
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.isKinematic = true; // ナビメッシュ移動の妨げにならないようKinematicにする
 

@@ -1,7 +1,8 @@
 ﻿using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
 using Unity.Cinemachine;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -40,8 +41,8 @@ public class GameManager : MonoBehaviour
     public Text startWaveGuideText;
 
     [Header("Result UI Displays")]
-    public Text resultTitleText;    // 「GAME OVER」または「GAME CLEAR」
-    public Text resultWaveText;     // 「Reached Wave: X」など
+    public Text resultTitleText;    
+    public Text resultWaveText;     
 
     [Header("Game Data")]
     public int currentWave = 1;
@@ -115,7 +116,7 @@ public class GameManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // 💡 リザルトフェーズでない時のみ建築UIを表示
+            // リザルトフェーズでない時のみ建築UIを表示
             if (buildUIGroup) buildUIGroup.SetActive(currentGameState == GameState.BuildPhase);
             if (actionUIGroup) actionUIGroup.SetActive(false);
         }
@@ -257,7 +258,7 @@ public class GameManager : MonoBehaviour
         if (resultUIGroup) resultUIGroup.SetActive(false);
     }
 
-    // 💡 修正: ゲーム開始時に全てのUIを一回非表示にしてから初期化
+    // ゲーム開始時に全てのUIを一回非表示にしてから初期化
     private void InitializeGame()
     {
         currentWave = 1;
@@ -267,15 +268,17 @@ public class GameManager : MonoBehaviour
 
         currentGameState = GameState.BuildPhase;
 
-        // 全UIを一度隠す（これでResultUIGroupも消えます）
+        // 全UIを一度隠す
         HideAllUI();
 
         // 俯瞰視点にして建築用UIを有効化
         SetViewMode(ViewMode.Overview);
+
+        
     }
 
     public void ResetGame()
     {
-        InitializeGame();
+        SceneManager.LoadScene("main");
     }
 }

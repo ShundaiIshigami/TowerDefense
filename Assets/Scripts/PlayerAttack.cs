@@ -1,25 +1,26 @@
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAttack : MonoBehaviour
+public class OrbitWeaponManager : MonoBehaviour
 {
     [Header("References")]
     public GameManager gameManager;
 
     [Header("Bullet Settings")]
-    public GameObject bulletPrefab;     // ’e‚ÌƒvƒŒƒnƒu
-    public int bulletCost = 10;         // ’e1”­‚ÌƒS[ƒ‹ƒhƒRƒXƒg
-    public float orbitDistance = 2.5f;  // ‰ñ“]”¼Œa
-    public float orbitSpeed = 360.0f;   // ‰ñ“]‘¬“xi360‚È‚ç1•b‚Å1üj
+    public GameObject bulletPrefab;     // å¼¾ã®ãƒ—ãƒ¬ãƒãƒ–
+    public int bulletCount = 2;         // å¼¾ã®æ•°ã‚’ 2 å€‹ã«å¤‰æ›´
+    public int bulletCost = 10;         // ç™ºå‹•ã«å¿…è¦ãªã‚´ãƒ¼ãƒ«ãƒ‰
+    public float orbitDistance = 2.5f;  // å›è»¢åŠå¾„
+    public float orbitSpeed = 360.0f;   // å›è»¢é€Ÿåº¦
 
     void Update()
     {
         if (gameManager == null) return;
 
-        // WavePhase ‚©‚Â PlayerView ‹“_‚Ì‚Ì‚İUŒ‚‰Â”\
+        // WavePhase ã‹ã¤ PlayerView è¦–ç‚¹ã®æ™‚ã®ã¿æ”»æ’ƒå¯èƒ½
         if (gameManager.currentGameState == GameManager.GameState.WavePhase &&
             gameManager.currentViewMode == GameManager.ViewMode.PlayerView)
         {
-            // ƒ}ƒEƒX¶ƒNƒŠƒbƒNi‚Ü‚½‚Í E ƒL[‚È‚Çj‚Å”­“®
             if (Input.GetMouseButtonDown(0))
             {
                 TryShootOrbitBullet();
@@ -29,30 +30,36 @@ public class PlayerAttack : MonoBehaviour
 
     public void TryShootOrbitBullet()
     {
-        // ƒS[ƒ‹ƒh‚ª‘«‚è‚È‚¢ê‡‚Í”­“®•s‰Â
         if (gameManager.playerGold < bulletCost)
         {
-            Debug.Log("ƒS[ƒ‹ƒh‚ª‘«‚è‚Ü‚¹‚ñI");
+            Debug.Log("ã‚´ãƒ¼ãƒ«ãƒ‰ãŒè¶³ã‚Šã¾ã›ã‚“ï¼");
             return;
         }
 
-        // ƒS[ƒ‹ƒh‚ğÁ”ï
         gameManager.playerGold -= bulletCost;
 
-        // ’e‚ğ¶¬
         if (bulletPrefab != null)
         {
-            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+            // å‡ç­‰ãªè§’åº¦é–“éš”ã‚’è¨ˆç®—ï¼ˆ2ç™ºãªã‚‰ 180åº¦ é–“éš”ï¼‰
+            float angleStep = 360f / bulletCount;
 
-            Bullet orbitComp = bullet.GetComponent<Bullet>();
-            if (orbitComp == null)
+            for (int i = 0; i < bulletCount; i++)
             {
-                orbitComp = bullet.AddComponent<Bullet>();
-            }
+                float initialAngle = i * angleStep;
 
-            orbitComp.centerPoint = transform; // ƒvƒŒƒCƒ„[‚ğ’†S‚É‰ñ“]
-            orbitComp.orbitDistance = orbitDistance;
-            orbitComp.orbitSpeed = orbitSpeed;
+                GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+
+                Bullet orbitComp = bullet.GetComponent<Bullet>();
+                if (orbitComp == null)
+                {
+                    orbitComp = bullet.AddComponent<Bullet>();
+                }
+
+                orbitComp.centerPoint = transform;
+                orbitComp.orbitDistance = orbitDistance;
+                orbitComp.orbitSpeed = orbitSpeed;
+                orbitComp.initialAngle = initialAngle; // åˆæœŸè§’åº¦ã‚’æ¸¡ã™
+            }
         }
     }
 }
